@@ -1,8 +1,12 @@
 import cantera as ct
+import numpy as np
 import matplotlib.pyplot as plt
 
-import PFR.constants as c
-import PFR.util_fns as fns
+#import PFR.constants as c
+#import PFR.util_fns as fns
+
+import constants as c
+import util_fns as fns
 
 def PFR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, u_i=c.u_i, area=c.area, length=c.length, n=2000):
     
@@ -17,14 +21,14 @@ def PFR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, u_i=c.u_i, area=c.area, length=c.l
     reactor = ct.IdealGasConstPressureReactor(gas)
      
     #Reactor network to advance initialized reactor through time
-    sim = ct.Reactornet([reactor])
+    sim = ct.ReactorNet([reactor])
 
     #Total residence time
     t = length/u_i
     dt = t/n
     
     #Array of time steps we are simulating
-    t_sim = (np.arange(n_steps) + 1) * dt #Skipping the first timestep, t = 0
+    t_sim = (np.arange(n) + 1) * dt #Skipping the first timestep, t = 0
     u_sim = np.zeros_like(t_sim)
     z_sim = np.zeros_like(t_sim)
     states = ct.SolutionArray(gas) #Container to store gas's thermodynamic property at each time step

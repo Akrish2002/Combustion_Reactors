@@ -48,6 +48,7 @@ def computesoln(gas, T_list, phi_list, P_list, cycle):
     plt.figure()
     for P_i in P_list:
         for phi_i in phi_list:
+            print("--Running case: P =", P_i, "phi =", phi_i, "\n") 
             for T_i in T_list:
                 _, t_sim, states = PFR(gas, T_i, P_i, phi_i)
                 T_profile = states.T
@@ -59,13 +60,14 @@ def computesoln(gas, T_list, phi_list, P_list, cycle):
             
             filename = f"T_vs_time_P{int(P_i/ct.one_atm)}atm_phi{phi_i}.png"
             plt.savefig(filename)
-            plt.close() 
+            plt.close()
+     
             if(cycle == 1): return   
 
 T_list = [1200, 1400, 1600, 1800]
 phi_list = [0.5, 1.0, 1.5]
 P_list = [1, 10]
-cycle = 1
+cycle = 0
 
 gas = fns.load_mechanism("mech-FFCM1.yaml")
 computesoln(gas, T_list, phi_list, P_list, cycle)    

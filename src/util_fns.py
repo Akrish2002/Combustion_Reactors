@@ -21,7 +21,7 @@ def set_mixture(gas, T=c.T_i, P=c.P_i, phi=c.phi, fuel='CH4', oxidizer={'O2': 1.
 
     gas.set_equivalence_ratio(phi, fuel, oxidizer)
     gas.TP = T, P
-    print("--Mixture changes have been set\n")
+    #print("--Mixture changes have been set\n")
 
     return gas
 

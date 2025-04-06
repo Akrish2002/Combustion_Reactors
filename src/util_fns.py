@@ -1,6 +1,6 @@
 import cantera as ct
 
-import reactor.constants as c
+import PFR.constants as c
 
 def load_mechanism(mech_file):
 
@@ -16,3 +16,5 @@ def set_mixture(gas, T=c.T_i, P=c.P_i, phi=c.phi, fuel='CH4', oxidizer={'O2': 1.
     gas.TP = T, P
     print("--Mixture changes have been set\n")
     return gas
+
+    

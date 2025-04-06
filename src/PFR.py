@@ -1,7 +1,8 @@
 import cantera as ct
+import matplotlib.pyplot as plt
 
-import reactor.constants as c
-import reactor.util_fns as fns
+import PFR.constants as c
+import PFR.util_fns as fns
 
 def PFR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, u_i=c.u_i, area=c.area, length=c.length, n=2000):
     
@@ -26,19 +27,41 @@ def PFR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, u_i=c.u_i, area=c.area, length=c.l
     t_sim = (np.arange(n_steps) + 1) * dt #Skipping the first timestep, t = 0
     u_sim = np.zeros_like(t_sim)
     z_sim = np.zeros_like(t_sim)
-    states = ct.SolutionArray(gas) #Container to store gas's thermodynamic property at                                   each time step
+    states = ct.SolutionArray(gas) #Container to store gas's thermodynamic property at each time step
     
     for i, t in enumerate(t_sim):
         sim.advance(t)
         
         u_sim[i] = mass_flow_rate/(reactor.thermo.density * area)
-        z_sim[i] = z_sim[i - 1] + u_sim[i] * dt #Computing the new axial location in                                                   the reactor
+        z_sim[i] = z_sim[i - 1] + u_sim[i] * dt #Computing the new axial location in the reactor
         states.append(reactor.thermo.state)
         
     return z_sim, t_sim, states 
 
+def computesoln(gas, T_list, phi_list, P_list, cycle):
+    
+    #Q1.a
+    plt.figure()
+    for P_i in P_list:
+        for phi_i in phi_list:
+            for T_i in T_list:
+                _, t_sim, states = PFR(gas, T_i, P_i, phi_i)
+                T_profile = states.T
+                plt.plot(t_sim, T_profile, label = f"T₀ = {T_i} K, phi₀ = {phi_i}, P₀ = {P_i} atm")
+         
+            plt.xlabel("Time [s]")
+            plt.ylabel("Temperature [K]")
+            plt.grid(True)
+            
+            filename = f"T_vs_time_P{int(P_i/ct.one_atm)}atm_phi{phi_i}.png"
+            plt.savefig(filename)
+            plt.close() 
+            if(cycle == 1): return   
 
+T_list = [1200, 1400, 1600, 1800]
+phi_list = [0.5, 1.0, 1.5]
+P_list = [1, 10]
+cycle = 1
 
 gas = fns.load_mechanism("mech-FFCM1.yaml")
-
-    
+computesoln(gas, T_list, phi_list, P_list, cycle)    

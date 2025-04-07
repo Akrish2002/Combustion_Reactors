@@ -8,7 +8,6 @@ import util_fns as fns
 def PFR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3.76}, u_i=c.u_i, area=c.area, length=c.length, n=2000):
     
     gas = fns.set_mixture(gas, T_i, P_i, phi, ox=ox) 
-    print(gas())
 
     #Assumption --> Mass flow rate stays constant through the PFR 
     #Will use it to recalculate velocity with changing density
@@ -40,7 +39,7 @@ def PFR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3
         
     return z_sim, t_sim, states 
 
-def WSR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3.76}):
+def WSR(gas, tau=c.tau, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3.76}):
 
     '''
     Following arrangement is considered for the well sttired reactor :
@@ -49,16 +48,18 @@ def WSR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3
     '''
 
     gas = fns.set_mixture(gas, T_i, P_i, phi)
-   
+
+     
     inlet = ct.Reservoir(gas)
+    #gas.equilibrate('HP') 
+    stirred_reactor = ct.IdealGasReactor(gas, energy='on', volume=c.V)
     exhaust = ct.Reservoir(gas)
     
-    stirred_reactor = ct.IdealGasReactor(gas, energy='on', volume=c.V)
-    mfr = fns.massflowrate(stirred_reactor.density)
 
     #Massflow controller
+    mfr = fns.massflowrate(stirred_reactor.density, tau=tau)
     mass_flow_controller = ct.MassFlowController(upstream=inlet, 
-                                                 downstream=exhaust,
+                                                 downstream=stirred_reactor,
                                                  mdot=mfr)
 
     pressure_regulator = ct.PressureController(upstream=stirred_reactor,
@@ -68,7 +69,7 @@ def WSR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3
     sim = ct.ReactorNet([stirred_reactor])
 
     time = 0.0
-    t_end = 10 * c.tau
+    t_end = 10 * tau
     T1 = stirred_reactor.T
     
     while time < t_end:
@@ -76,16 +77,15 @@ def WSR(gas, T_i=c.T_i, P_i=c.P_i, phi=c.phi, fuel='CH4', ox={'O2': 1.0, 'N2': 3
         T2 = stirred_reactor.T
         
         #Checking for steady state
-        if time > c.tau and abs(T2 - T1)/T1 < 1e-4:
+        if time > tau and abs(T2 - T1)/T1 < 1e-4:
             break
         
         T1 = T2
+        
 
     T_ss = stirred_reactor.T
     X_CO = stirred_reactor.thermo['CO'].X[0]
     X_CO2 = stirred_reactor.thermo['CO2'].X[0]
     X_NO = stirred_reactor.thermo['NO'].X[0] if 'NO' in gas.species_names else 0.0
-
-    print(T_ss)
-    print(exhaust.T)
-
+    
+    return T_ss, X_CO, X_CO2, X_NO

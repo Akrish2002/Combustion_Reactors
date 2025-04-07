@@ -12,6 +12,6 @@ u_i = 5e-1 #m/s
 area = 1e-4 #m^2
 
 #WSR constants
-tau = 10 #[s]
-V = 1 #[m^3]
+tau = 1e8 #[s]
+V = 1e1 #[m^3]
 

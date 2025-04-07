@@ -12,7 +12,7 @@ import reactors as r
 def computesoln(gas, T, P, phi, Q, cycle=0):
     
     #Q1.a.1
-    if(Q == 1):
+    if(Q == "1.a.1"):
         plt.figure()
         for P_i in P_list:
             for phi_i in phi_list:
@@ -33,7 +33,7 @@ def computesoln(gas, T, P, phi, Q, cycle=0):
                 if(cycle == 0): return   
     
     #Q1.a.2
-    elif(Q ==2):
+    elif(Q == "1.a.2"):
         plt.figure()
         z_sim, _, states = r.PFR(gas, T, P, phi)
         
@@ -80,21 +80,31 @@ def computesoln(gas, T, P, phi, Q, cycle=0):
         plt.close()
 
     #Q1.b
-    elif(Q == 3):
-        ox = [{'O2': 1.0}, {'O2': 0.207, 'N2': 0.79, 'OH': 0.003}, {'O2': 0.207, 'N2': 0.79, 'H2O': 0.003}]
+    elif(Q == "1.b"):
+        oxidizer_list = [{'O2': 1.0, 'N2': 3.76}, {'O2': 1.0}, {'O2': 0.207, 'N2': 0.79, 'OH': 0.003}, {'O2': 0.207, 'N2': 0.79, 'H2O': 0.003}]
   
-        #Establishing with ox[0[
-        gas = fns.set_mixture(gas, T, P, phi, 'CH4', ox[0])
+        plt.figure()
 
-        #Running PFR
-        _, t_sim, states = r.PFR(gas, T, P, phi)
-        T_profile = states.T
+#       _, t_sim, states = r.PFR(gas, T, P, phi, ox=oxidizer_list[0])
+#       T_profile = states.T
+#
+#       plt.plot(t_sim, T_profile)
+#       print("--Q1.b gas mixture has been plotted for:", oxidizer_list[0])
+
+        for ox in oxidizer_list:
+  
+            #Running PFR
+            _, t_sim, states = r.PFR(gas, T, P, phi, ox=ox)
+            T_profile = states.T
+            
+            plt.plot(t_sim, T_profile)
+            print("--Q1.b gas mixture has been plotted for:", ox)
         
-        plt.figure() 
-        plt.plot(t_sim, T_profile)
-        plt.savefig("First.png")
-        print("--Q1.b gas mixture has been plotted for:", ox[0])
+        plt.xscale("log")
+        plt.savefig("TvsTime_ox.png")
 
+    elif(Q == "2"):
+        r.WSR(gas, T, P, phi)
 
 gas = fns.load_mechanism("mech-FFCM1.yaml")
 
@@ -103,10 +113,15 @@ T_list = [1200, 1400, 1600, 1800]
 phi_list = [0.5, 1.0, 1.5]
 P_list = [ct.one_atm, 10*ct.one_atm]
 cycle = 1
-#computesoln(gas, T_list, P_list, phi_list, 1, cycle)    
+#computesoln(gas, T_list, P_list, phi_list, "1.a.1", cycle)    
 
 #Q1.a.2
-#computesoln(gas, 1400, ct.one_atm, 1.5, 2)
+#computesoln(gas, 1400, ct.one_atm, 1.5, "1.a.2")
 
 #Q1.b
-computesoln(gas, 1400, ct.one_atm, 0.5, 3)
+#computesoln(gas, 1400, ct.one_atm, 0.5, "1.b")
+
+#Q2
+gas = ct.Solution('gri30.yaml')
+computesoln(gas, 900, ct.one_atm, 0.85, "2")
+

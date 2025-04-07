@@ -11,3 +11,7 @@ length = 5e-2 #m
 u_i = 5e-1 #m/s
 area = 1e-4 #m^2
 
+#WSR constants
+tau = 10 #[s]
+V = 1 #[m^3]
+

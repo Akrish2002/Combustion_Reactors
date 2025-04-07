@@ -2,9 +2,6 @@ import cantera as ct
 import numpy as np
 import matplotlib.pyplot as plt
 
-#import PFR.constants as c
-#import PFR.util_fns as fns
-
 import constants as c
 import util_fns as fns
 

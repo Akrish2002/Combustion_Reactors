@@ -8,28 +8,6 @@ import reactors as r
 
 def computesoln(gas, T, P, phi, Q, cycle=0):
     
-#   #Q1.a.1
-#   if(Q == "1.a.1"):
-#       plt.figure()
-#       for P_i in P_list:
-#           for phi_i in phi_list:
-#               print("--Running case: P =", P_i, "phi =", phi_i) 
-#               for T_i in T_list:
-#                   _, t_sim, states = r.PFR(gas, T_i, P_i, phi_i)
-#                   T_profile = states.T
-#                   plt.plot(t_sim, T_profile, label = f"T₀ = {T_i} K, phi₀ = {phi_i}, P₀ = {P_i} atm")
-#            
-#               plt.xlabel("Time [s]")
-#               plt.ylabel("Temperature [K]")
-#               plt.grid(True)
-#               
-#               filename = f"T_vs_time_P{int(P_i/ct.one_atm)}atm_phi{phi_i}.png"
-#               plt.savefig(filename)
-#               plt.title
-#               plt.close()
-#
-#               if(cycle == 0): return   
-        
     if(Q == "1.a.1"):
         for P_i in P_list:
             for phi_i in phi_list:
@@ -221,6 +199,7 @@ def computesoln(gas, T, P, phi, Q, cycle=0):
         plt.tight_layout()
         plt.savefig("WSR_tau_sweep.png")
         plt.show()
+
         
 gas = fns.load_mechanism("mech-FFCM1.yaml")
 
@@ -238,6 +217,6 @@ cycle = 1
 #computesoln(gas, 1400, ct.one_atm, 0.5, "1.b")
 
 #Q2
-#gas = ct.Solution('gri30.yaml')
+gas = ct.Solution('gri30.yaml')
 computesoln(gas, 300, ct.one_atm, 0.85, "2")
 
